@@ -1,0 +1,50 @@
+<style>
+	body	{ overflow: none; padding: 32px; color: white; background-color: black; font-family: monospace; }
+	p { white-space: pre; text-align: left; }
+	.tty	{ diplay: block; }
+	.input	{ display: none; height: 0px; }
+	.typing	{ overflow: hidden; width: 0px; white-space: nowrap;
+		animation: typing 1.5s steps(var(--chars)) 0.08s both;
+	}
+	@keyframes typing {
+		from { width: 0px; }
+		to { width: calc(var(--chars) * 1ch); }
+	}
+</style>
+<body>
+	<div id="tty" class="tty"/>
+</body>
+<script defer>
+document.addEventListener("DOMContentLoaded", parse);
+
+function parse () {
+	var offtime = 0;
+	var last = false;
+	const content = document.getElementById("input");
+	const text = content.innerHTML.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	lines = text.split("\n");
+	for(const line of lines) {
+		setecho( offtime * 3000, line );
+		if ( line[0] == '$' ) { offtime++; }
+	}
+	console.log("Total animation time:", offtime*3);
+}
+
+function setecho (when, what) {
+	setTimeout( function() {
+		echo(what)
+		window.scrollTo(0, document.body.scrollHeight);
+	}, when);
+}
+
+function echo (text) {
+	const parent = document.getElementById("tty");
+	const self = document.createElement("p");
+	self.innerHTML = text;
+	if (text[0] == '$') {
+		self.className = "typing";
+		self.style.setProperty("--chars", text.length);
+	}
+	parent.appendChild(self);
+}
+</script>
